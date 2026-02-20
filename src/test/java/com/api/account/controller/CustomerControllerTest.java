@@ -1,7 +1,7 @@
 package com.api.account.controller;
 
-import com.api.account.model.dto.CustomerRequest;
-import com.api.account.model.dto.CustomerResponse;
+import com.api.account.model.dto.request.CustomerRequest;
+import com.api.account.model.dto.response.CustomerResponse;
 import com.api.account.service.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

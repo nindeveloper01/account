@@ -1,4 +1,4 @@
-package com.api.account.model.dto;
+package com.api.account.model.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

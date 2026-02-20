@@ -1,7 +1,7 @@
 package com.api.account.service;
 
-import com.api.account.model.dto.CustomerRequest;
-import com.api.account.model.dto.CustomerResponse;
+import com.api.account.model.dto.request.CustomerRequest;
+import com.api.account.model.dto.response.CustomerResponse;
 
 import java.util.List;
 

@@ -1,15 +1,12 @@
 package com.api.account.controller;
 
-import com.api.account.model.Customer;
-import com.api.account.model.dto.CustomerRequest;
-import com.api.account.model.dto.CustomerResponse;
+import com.api.account.model.dto.request.CustomerRequest;
+import com.api.account.model.dto.response.CustomerResponse;
 import com.api.account.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

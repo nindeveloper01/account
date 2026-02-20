@@ -1,4 +1,4 @@
-package com.api.account.model.dto;
+package com.api.account.model.dto.request;
 
 import java.time.LocalDate;
 

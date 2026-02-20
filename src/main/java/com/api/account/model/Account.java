@@ -1,21 +1,40 @@
 package com.api.account.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.util.List;
 
-@Entity
-@Data
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
 @Table(name = "accounts")
+@Entity
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long accountNumber;
+    private Integer id;
+    private String alias;
+    private String actName;
+    private String actNo;
+    private BigDecimal balance;
+    private BigDecimal transferLimit;
+    private Boolean isHidden;
+    // accounts have only account type one
     @ManyToOne
-    @JoinColumn(name = "customerId")
-    private Customer customer;
-    private String accountType;
-    private String branchAddress;
-    private LocalDate createDate;
+    private AccountType accountType;
+    @OneToOne
+    private Card card;
+    @ManyToOne
+    @JoinTable(
+            name = "user_accounts",
+            joinColumns = @JoinColumn(name = "account_id",referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private User user;
+    @OneToMany(mappedBy = "owner")
+    private List<Transaction> transactionsOfOwner;
 }
