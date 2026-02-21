@@ -1,47 +1,55 @@
 package com.api.account.repository;
 
 import com.api.account.model.Customer;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-@DataJpaTest // Starts an embedded H2 database
+@DataJpaTest
 class CustomerRepositoryTest {
 
     @Autowired
     private CustomerRepository customerRepository;
 
+    private Customer alice;
+
+    @BeforeEach
+    void setUp() {
+        // Prepare data before EVERY test
+        alice = new Customer();
+        alice.setName("Alice");
+        alice.setEmail("alice@example.com");
+        alice.setMobileNumber("0987654321");
+        alice.setCreateDate(LocalDate.now());
+    }
     @Test
     void shouldSaveAndFindCustomer() {
-        // 1. Arrange: Create a new Entity
-        Customer customer = new Customer();
-        customer.setName("Alice");
-        customer.setEmail("alice@example.com");
-        customer.setMobileNumber("0987654321");
-        customer.setCreateDate(LocalDate.now());
+        // Arrange
+        Customer customer = new Customer(null, "Alice", "alice@example.com", "0987654321", LocalDate.now(), false);
 
-        // 2. Act: Save to H2
-        Customer savedCustomer = customerRepository.save(customer);
+        // Act
+        Customer saved = customerRepository.save(customer);
 
-        // 3. Assert: Check if it exists in H2
-        Optional<Customer> foundCustomer = customerRepository.findById(savedCustomer.getCustomerId());
-
-        assertTrue(foundCustomer.isPresent());
-        assertEquals("alice@example.com", foundCustomer.get().getEmail());
+        // Assert
+        Optional<Customer> found = customerRepository.findById(saved.getCustomerId());
+        assertTrue(found.isPresent());
+        assertEquals("Alice", found.get().getName());
     }
+
     @Test
     void testStorage() {
-        // ... run your test ...
+        customerRepository.save(alice);
 
-        // Check the database count
         long count = customerRepository.count();
-        System.out.println("Current customers in H2: " + count);
-
+        // This will now pass because we saved inside the setup/test
         assertEquals(1, count);
     }
+
+
 }

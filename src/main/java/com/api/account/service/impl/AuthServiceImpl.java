@@ -1,15 +1,20 @@
 package com.api.account.service.impl;
 
 import com.api.account.mapper.UserMapper;
+import com.api.account.model.Role;
+import com.api.account.model.User;
 import com.api.account.model.dto.request.LoginRequest;
 import com.api.account.model.dto.request.RefreshTokenRequest;
+import com.api.account.model.dto.request.RegisterRequest;
 import com.api.account.model.dto.response.AuthResponse;
+import com.api.account.model.dto.response.RegisterResponse;
 import com.api.account.repository.RoleRepository;
 import com.api.account.repository.UserRepository;
 import com.api.account.repository.UserVerificationRepository;
 import com.api.account.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -19,11 +24,13 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
         Authentication auth = new UsernamePasswordAuthenticationToken(loginRequest.phoneNumber(),loginRequest.password());
         auth = daoAuthenticationProvider.authenticate(auth);
         // log auth
-        log.info("Auth: {}", auth.getPrincipal());
+        log.info("Auth: {}", auth.getAuthorities());
 
         // log role user
         auth.getAuthorities()
@@ -168,6 +175,51 @@ public class AuthServiceImpl implements AuthService {
                 .tokenType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .build();
+    }
+
+    @Override
+    public RegisterResponse register(RegisterRequest registerRequest) {
+        if(userRepository.existsByPhoneNumber(registerRequest.phoneNumber())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already exists");
+        }
+        if(userRepository.existsByEmail(registerRequest.email())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+        }
+        if(!registerRequest.password().equals(registerRequest.confirmedPassword())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Passwords do not match");
+        }
+        // validate national id card
+        if(userRepository.existsByNationalCardId(registerRequest.nationalCardId())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "National card already been used");
+        }
+        // validate term and policy
+        if(!registerRequest.acceptTerm()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "You must accept the term");
+        }
+        //step 2 map data
+        User user =  userMapper.fromRegisterRequest(registerRequest);
+        user.setUuid(UUID.randomUUID().toString());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));// encode password
+        user.setProfileImage("profile/default-user.png");
+        user.setIsBlocked(false);
+        user.setIsDeleted(false);
+        user.setIsVerified(false);
+        //set to system
+        Role roleUser = roleRepository.findRoleUser();// default role
+        Role roleCustomer = roleRepository.findRoleCustomer();
+        // add role in list and set
+        List<Role> roles = List.of(roleUser, roleCustomer);
+        user.setRoles(roles);
+        //save to model
+        userRepository.save(user);
+
+        return  RegisterResponse.builder()
+                .message("You have registered successfully, please verify your email")
+                .email(user.getEmail())
                 .build();
     }
 }
