@@ -1,11 +1,10 @@
 package com.api.account.controller;
 
-import com.api.account.model.dto.request.LoginRequest;
-import com.api.account.model.dto.request.RefreshTokenRequest;
-import com.api.account.model.dto.request.RegisterRequest;
+import com.api.account.model.dto.request.*;
 import com.api.account.model.dto.response.AuthResponse;
 import com.api.account.model.dto.response.RegisterResponse;
 import com.api.account.service.AuthService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,5 +30,22 @@ public class AuthController {
     @PostMapping("/register")
     RegisterResponse register(@Valid @RequestBody RegisterRequest registerRequest) {
         return authService.register(registerRequest);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/send-verification")
+    void sendVerification(@Valid @RequestBody SendVerificationRequest sendVerificationRequest) throws MessagingException {
+        authService.sendVerification(sendVerificationRequest.email()) ;
+    }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/verify")
+    void verify(@Valid @RequestBody VerificationRequest verificationRequest) throws MessagingException  {
+        authService.verify(verificationRequest);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/resend-verification")
+    void resendVerification(@Valid @RequestBody SendVerificationRequest sendVerificationRequest) throws MessagingException {
+        authService.resendVerification(sendVerificationRequest.email()) ;
     }
 }

@@ -73,7 +73,7 @@ public class DataInit {
             user2.setPassword(passwordEncoder.encode("Kinin@1234"));
             user2.setPin("1234");
             user2.setPhoneNumber("0122343440");
-            user2.setEmail("kininchhaykd@gmail.com");
+            user2.setEmail("kinin@gmail.com");
             user2.setNationalCardId("123456779");
             user2.setStudentCardId("HRD-1000");
             user2.setProfileImage("user3/string.png");

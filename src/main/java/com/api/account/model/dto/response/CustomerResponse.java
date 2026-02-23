@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @AllArgsConstructor // Generates the constructor for your test
 @NoArgsConstructor
 public class CustomerResponse {
-    private Long customerId;
+    private Long id;
     private String name;
     private String email;
     private String mobileNumber;

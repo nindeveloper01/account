@@ -37,7 +37,7 @@ class CustomerRepositoryTest {
         Customer saved = customerRepository.save(customer);
 
         // Assert
-        Optional<Customer> found = customerRepository.findById(saved.getCustomerId());
+        Optional<Customer> found = customerRepository.findById(saved.getId());
         assertTrue(found.isPresent());
         assertEquals("Alice", found.get().getName());
     }
